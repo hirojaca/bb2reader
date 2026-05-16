@@ -378,4 +378,3 @@ function displayStatus(result) {
     $('#status-tbody').html(html);
     $('#status-area').show(); // 非表示だったエリアを表示
 }
-}
