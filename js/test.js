@@ -1,3 +1,9 @@
+let _scannerIsRunning = false; // エラー回避のため事前に定義
+
+$(function () {
+    startScanner();
+});
+
 const startScanner = () => {
     Quagga.init({
         inputStream: {
@@ -10,26 +16,15 @@ const startScanner = () => {
                 facingMode: "environment" // 背面カメラ
             },
         },
-        // Quaggaの誤認識防止などの独自設定は init の直下に書くのが一般的（一旦無しで動かすのが確実です）
         locate: true, 
         decoder: {
             readers: [
-                "i2of5_reader" // ITfコード
+                "i2of5_reader" // ITFコード
             ]
         },
-
     }, function (err) {
         if (err) {
-            console.log(err);
-            return;
-        }
-
-        console.log("Initialization finished. Ready to start");
-        Quagga.start();
-
-}, function (err) {
-        if (err) {
-            console.log(err);
+            console.log("Quagga Init Error:", err);
             return;
         }
 
@@ -37,29 +32,29 @@ const startScanner = () => {
         Quagga.start();
         _scannerIsRunning = true;
 
-        // ★ここにチェック用コードを追加
+        // ★実機でカメラ映像が止まる問題を追跡するための検証コード
         setTimeout(() => {
             const video = document.querySelector('#photo-area video');
             if (video) {
-                console.log("Video tag found!", video.srcObject);
-                console.log("Video dimensions:", video.videoWidth, "x", video.videoHeight);
+                console.log("【検証】videoタグを発見:", video.srcObject);
+                console.log("【検証】カメラ解像度:", video.videoWidth, "x", video.videoHeight);
                 
                 // もし動画が一時停止状態なら強制再生を試みる
                 if (video.paused) {
-                    console.log("Video is paused. Trying to play forcedly...");
-                    video.play().catch(e => console.log("Force play failed:", e));
+                    console.log("【検証】動画が一時停止しています。強制再生を試みます...");
+                    video.play()
+                        .then(() => console.log("【検証】強制再生に成功しました！"))
+                        .catch(e => console.log("【検証】強制再生に失敗:", e));
+                } else {
+                    console.log("【検証】動画は再生状態になっています。");
                 }
             } else {
-                console.log("Video tag NOT found inside #photo-area");
+                console.log("【検証】#photo-area の中にvideoタグが見つかりません。");
             }
-        }, 1000); // 起動1秒後にチェック
-    });
-        
-        // 未定義エラーを防ぐためグローバル宣言か、事前に let _scannerIsRunning; を定義してください
-        _scannerIsRunning = true; 
+        }, 1000); // 起動1秒後に実行
     });
 
-    // --- 以降の Quagga.onProcessed と onDetected はそのままで大丈夫です ---
+    // 描画処理（緑枠などの表示）
     Quagga.onProcessed(function (result) {
         var drawingCtx = Quagga.canvas.ctx.overlay,
             drawingCanvas = Quagga.canvas.dom.overlay;
@@ -102,7 +97,8 @@ const startScanner = () => {
         }
     });
 
+    // バーコードを検出したときの処理
     Quagga.onDetected(function (result) {
-        console.log(result.codeResult.code);
+        console.log("読み取り成功:", result.codeResult.code);
     });
 }
