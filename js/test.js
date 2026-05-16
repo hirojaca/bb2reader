@@ -103,7 +103,7 @@ const startScanner = () => {
             $('#result-text').text(currentCode);
             console.log("確定コード:", currentCode);
             
-            // ★【追加】読み取ったコードを解析してステータスを表示する処理を呼び出し
+            // 読み取ったコードを解析してステータスを表示する処理を呼び出し
             const decodedResult = decodeBarcode(currentCode);
             displayStatus(decodedResult);
             
@@ -112,7 +112,7 @@ const startScanner = () => {
             _matchCount = 0;
         }
     });
-}; // ←ココ！ここで startScanner の閉じカッコが抜けていました
+}; // ← ここで startScanner 関数のスコープを正しく閉じました
 
 
 // --- バーコードバトラーII 解析メインロジック ---
@@ -162,8 +162,7 @@ function decodeBarcode(codeStr) {
     // 2. フォーマットごとにパラメータを抽出
     let res = { format: format, isCharacter: false, params: {} };
     
-    // キャラクターかアイテムかの判定フラグ（判定基準の桁はフォーマットで異なる）
-    const judgeDigit = (format === "後読み8桁") ? digits[8] : digits[8]; 
+    // キャラクターかアイテムかの判定フラグ
     const checkTypeDigit = (format === "後読み8桁") ? digits[8] : (format === "後読み13桁" ? digits[13] : digits[8]); 
     
     if (checkTypeDigit <= 4) {
