@@ -20,8 +20,15 @@ const startScanner = () => {
         locate: true, 
         decoder: {
             readers: [
-                "i2of5_reader" // ITFコード
-            ]
+                "i2of5_reader"
+            ],
+            config: {
+                // 例：もし14桁のITF（標準物流コードなど）を読みたい場合
+                // 桁数を固定することで、Quaggaが自信を持って一瞬で認識できるようになります
+                i2of5: {
+                    length: [14] 
+                }
+            }
         },
     }, function (err) {
         if (err) {
