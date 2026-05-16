@@ -1,14 +1,26 @@
+/* 1. 親要素の枠 */
 #photo-area.viewport {
-   height: 240px;
-   width:320px;
+    height: 240px;
+    width: 320px;
+    position: relative; /* 子要素を重ねるための基準 */
+    background-color: #000; /* カメラが映る前の確認用に黒背景にしておく */
+    overflow: hidden;
 }
 
-#photo-area.viewport canvas, video {
-   float: left;
-   width:320px;
-   height: 240px;
+/* 2. 中のビデオとキャンバスをぴったり重ねる */
+#photo-area.viewport video,
+#photo-area.viewport canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 320px;
+    height: 240px;
 }
 
-#photo-area.viewport canvas.drawingBuffer, video.drawingBuffer {
-   margin-left: -320px;
+/* 3. 緑色の枠線などが描画されるキャンバス（完全に上に重ねる） */
+#photo-area.viewport canvas.drawingBuffer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 10;
 }
