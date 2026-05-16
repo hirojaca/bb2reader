@@ -10,7 +10,7 @@ const startScanner = () => {
     // ページを開いた直後は「スキャン中」状態にする
     updateStatus("スキャン中...");
 
-    Quagga.init({
+Quagga.init({
         inputStream: {
             name: "Live",
             type: "LiveStream",
@@ -18,15 +18,24 @@ const startScanner = () => {
             constraints: {
                 width: { min: 1024, ideal: 1920 },
                 height: { min: 768, ideal: 1080 },
-                facingMode: "environment" // 背面カメラ
+                facingMode: "environment", // 背面カメラ
+                
+                // ★【最重要】これを追記：1秒間に何回バーコードをガチ解析するか（15〜20回を推奨）
+                // これを入れることで、同じコードでも「毎フレーム全力で再読み込み」させます
+                decodeBarCodeRate: 15 
             },
         },
         locate: true, 
-        tryVertical: true, // 縦向きのバーコードにも対応
+        tryVertical: true,
+        
+        // ★これを追記：同じコードを何回も連続でイベント発生させることを許可するおまじない
+        // これが抜けていると、同じ数字のときに onDetected がフリーズします
+        codeRepetition: true, 
+        
         decoder: {
             readers: [
-                "ean_reader",   /* 標準の13桁JANコード用 */
-                "ean_8_reader"  /* 短縮型の8桁JANコード用 */
+                "ean_reader",
+                "ean_8_reader"
             ]
         },
     }, function (err) {
