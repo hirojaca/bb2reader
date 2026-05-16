@@ -94,8 +94,8 @@ const startScanner = () => {
             _matchCount = 1;               
         }
 
-        // 【確定判定】30回連続で同じ数字が一致したら処理をコミットする
-        if (_matchCount >= 30) {
+        // 【確定判定】15回連続で同じ数字が一致したら処理をコミットする
+        if (_matchCount >= 15) {
             _scannerIsRunning = false; 
             Quagga.stop(); // スキャン停止
 
