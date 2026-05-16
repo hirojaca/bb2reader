@@ -1,7 +1,3 @@
-$(function () {
-    startScanner();
-});
-
 const startScanner = () => {
     Quagga.init({
         inputStream: {
@@ -9,35 +5,33 @@ const startScanner = () => {
             type: "LiveStream",
             target: document.querySelector('#photo-area'),
             constraints: {
-                decodeBarCodeRate: 3,
-                successTimeout: 500,
-                codeRepetition: true,
-                tryVertical: true,
-                frameRate: 15,
                 width: 640,
                 height: 480,
-                facingMode: "environment"
+                facingMode: "environment" // 背面カメラ
             },
         },
+        // Quaggaの誤認識防止などの独自設定は init の直下に書くのが一般的（一旦無しで動かすのが確実です）
+        locate: true, 
         decoder: {
             readers: [
-                "i2of5_reader"
+                "i2of5_reader" // ITfコード
             ]
         },
 
     }, function (err) {
         if (err) {
             console.log(err);
-            return
+            return;
         }
 
         console.log("Initialization finished. Ready to start");
         Quagga.start();
 
-        // Set flag to is running
-        _scannerIsRunning = true;
+        // 未定義エラーを防ぐためグローバル宣言か、事前に let _scannerIsRunning; を定義してください
+        _scannerIsRunning = true; 
     });
 
+    // --- 以降の Quagga.onProcessed と onDetected はそのままで大丈夫です ---
     Quagga.onProcessed(function (result) {
         var drawingCtx = Quagga.canvas.ctx.overlay,
             drawingCanvas = Quagga.canvas.dom.overlay;
@@ -80,7 +74,6 @@ const startScanner = () => {
         }
     });
 
-    //barcode read call back
     Quagga.onDetected(function (result) {
         console.log(result.codeResult.code);
     });
