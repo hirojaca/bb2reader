@@ -98,8 +98,12 @@ const startScanner = () => {
         }
     });
 
-    // バーコードを検出したときの処理
+    // バーコードを検出したときの処理（ここを書き換え）
     Quagga.onDetected(function (result) {
+        // 1. 念のため今まで通りコンソールにも出す
         console.log("読み取り成功:", result.codeResult.code);
+
+        // 2. ★ここに追記：HTMLの #result-text の中身を書き換える
+        $('#result-text').text(result.codeResult.code);
     });
 }
