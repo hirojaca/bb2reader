@@ -11,8 +11,9 @@ const startScanner = () => {
             type: "LiveStream",
             target: document.querySelector('#photo-area'),
             constraints: {
-                width: 640,
-                height: 480,
+                // 固定値ではなく、理想的な解像度の範囲を指定する
+                width: { min: 640, ideal: 1280, max: 1920 },
+                height: { min: 480, ideal: 720, max: 1080 },
                 facingMode: "environment" // 背面カメラ
             },
         },
