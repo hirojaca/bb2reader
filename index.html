@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>バーコードリーダー試作</title>
+    <!-- QuaggaJSの読み込み (CDNを利用) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    <style>
+        /* カメラ映像を表示するエリアのスタイル */
+        #interactive.viewport {
+            width: 100%;
+            max-width: 640px;
+            height: auto;
+            overflow: hidden;
+            position: relative;
+        }
+        #interactive.viewport canvas, video {
+            width: 100%;
+            height: auto;
+        }
+        /* 読み取り結果の表示エリア */
+        #result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>バーコードリーダー テスト</h1>
+    
+    <!-- カメラ映像がここにリアルタイムで表示されます -->
+    <div id="interactive" class="viewport"></div>
+
+    <!-- 読み取った結果を表示する場所 -->
+    <div id="result-box">
+        読み取り結果: <span id="result">まだ読み取っていません</span>
+    </div>
+
+    <script>
+        // QuaggaJSの設定と起動
+        Quagga.init({
+            inputStream: {
+                name: "Live",
+                type: "LiveStream",
+                target: document.querySelector('#interactive'), // 映像を表示する要素
+                constraints: {
+                    width: 640,
+                    height: 480,
+                    facingMode: "environment" // "environment" で背面カメラを指定
+                },
+            },
+            decoder: {
+                readers: ["ean_reader"] // 一般的な商品バーコード（JANコード）を指定
+            }
+        }, function(err) {
+            if (err) {
+                console.error(err);
+                alert("カメラの起動に失敗しました: " + err);
+                return;
+            }
+            console.log("Quaggaの初期化が成功しました。");
+            Quagga.start(); // カメラ作動開始
+        });
+
+        // バーコードが読み取れた時の処理
+        Quagga.onDetected(function(data) {
+            const code = data.codeResult.code;
+            // 画面の「result」の部分を読み取った数字に書き換える
+            document.getElementById('result').textContent = code;
+        });
+    </script>
+</body>
+</html>
