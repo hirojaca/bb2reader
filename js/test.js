@@ -27,6 +27,34 @@ const startScanner = () => {
         console.log("Initialization finished. Ready to start");
         Quagga.start();
 
+}, function (err) {
+        if (err) {
+            console.log(err);
+            return;
+        }
+
+        console.log("Initialization finished. Ready to start");
+        Quagga.start();
+        _scannerIsRunning = true;
+
+        // ★ここにチェック用コードを追加
+        setTimeout(() => {
+            const video = document.querySelector('#photo-area video');
+            if (video) {
+                console.log("Video tag found!", video.srcObject);
+                console.log("Video dimensions:", video.videoWidth, "x", video.videoHeight);
+                
+                // もし動画が一時停止状態なら強制再生を試みる
+                if (video.paused) {
+                    console.log("Video is paused. Trying to play forcedly...");
+                    video.play().catch(e => console.log("Force play failed:", e));
+                }
+            } else {
+                console.log("Video tag NOT found inside #photo-area");
+            }
+        }, 1000); // 起動1秒後にチェック
+    });
+        
         // 未定義エラーを防ぐためグローバル宣言か、事前に let _scannerIsRunning; を定義してください
         _scannerIsRunning = true; 
     });
