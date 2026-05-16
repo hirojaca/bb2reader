@@ -53,6 +53,11 @@
                     width: 640,
                     height: 480,
                     facingMode: "environment" // "environment" で背面カメラを指定
+                    // ↓ ここからズームの設定を追加
+                    advanced: [
+                        { zoom: 2.0 } // 2.0倍ズーム（好みに応じて 1.5 や 3.0 に変更可能）
+                    ]
+                    // ↑ ここまで
                 },
             },
             decoder: {
