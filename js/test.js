@@ -1,12 +1,8 @@
 $(function () {
-
     startScanner();
-
 });
 
-const startScanner = () => {    er
-
-/
+const startScanner = () => {
     Quagga.init({
         inputStream: {
             name: "Live",
