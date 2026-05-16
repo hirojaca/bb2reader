@@ -15,6 +15,10 @@
     top: 0;
     width: 320px;
     height: 240px;
+    
+    /* ★これを追記：中央を基準に1.8倍に拡大（数字はお好みで調整してください） */
+    transform: scale(1.8);
+    transform-origin: center center;
 }
 
 /* 3. 緑色の枠線などが描画されるキャンバス（完全に上に重ねる） */
