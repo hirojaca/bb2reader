@@ -1,7 +1,16 @@
-<!DOCTYPE html>  <html>
+<!DOCTYPE html>
+<html>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
         <link rel="stylesheet" href="https://hirojaca.github.io/bb2reader/css/test.css" />
+        <style>
+            /* 簡易的なステータス表示用スタイル */
+            #status-area { margin-top: 20px; font-family: monospace; border: 2px solid #ccc; padding: 10px; border-radius: 5px; background: #fafafa; display: none; }
+            .status-title { font-weight: bold; font-size: 18px; margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+            .param-table { width: 100%; border-collapse: collapse; }
+            .param-table td { padding: 5px; border-bottom: 1px solid #eee; }
+            .param-name { font-weight: bold; color: #333; width: 40%; }
+        </style>
     </head>
     <body>
         <h3>バーコード</h3>
@@ -9,8 +18,17 @@
             読み取り結果：<span id="result-text">まだ読み取っていません</span>
         </p>
         <div id="photo-area" class="viewport"></div>
+
+        <div id="status-area">
+            <div class="status-title" id="card-type">カードタイプ</div>
+            <table class="param-table">
+                <tbody id="status-tbody">
+                    </tbody>
+            </table>
+        </div>
+
         <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
         <script src="https://unpkg.com/@ericblade/quagga2@1.7.4/dist/quagga.min.js"></script>
-        <script src="https://hirojaca.github.io/bb2reader/js/test.js" type="text/javascript"></script>
+        <script src="test.js" type="text/javascript"></script>
     </body>
 </html>
