@@ -1,24 +1,26 @@
-/* 1. 親要素の枠 */
+/* 1. 親要素の枠（ここを完全な正方形にする） */
 #photo-area.viewport {
-    height: 240px;
-    width: 320px;
-    position: relative; /* 子要素を重ねるための基準 */
-    background-color: #000; /* カメラが映る前の確認用に黒背景にしておく */
-    overflow: hidden;
+    width: 300px;
+    height: 300px;
+    position: relative;
+    background-color: #000;
+    overflow: hidden;       /* 枠からはみ出たビデオ映像を綺麗にカットする */
+    border-radius: 8px;     /* お好みで角を少し丸くすると綺麗に見えます */
+    margin: 0 auto;         /* 画面の中央に配置 */
 }
 
-/* 2. 中のビデオとキャンバスをぴったり重ねる */
+/* 2. 中のビデオとキャンバス（ここが最重要！） */
 #photo-area.viewport video,
 #photo-area.viewport canvas {
     position: absolute;
-    left: 0;
-    top: 0;
-    width: 320px;
-    height: 240px;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(1.5) !important; /* 中央基準で1.5倍に強制ズーム */
     
-    /* ★これを追記：中央を基準に1.8倍に拡大（数字はお好みで調整してください） */
-    transform: scale(1.8);
-    transform-origin: center center;
+    /* アスペクト比を無視して枠いっぱいに広げ、はみ出しをカットするおまじない */
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important; 
 }
 
 /* 3. 緑色の枠線などが描画されるキャンバス（完全に上に重ねる） */
