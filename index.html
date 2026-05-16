@@ -1,147 +1,32 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>バーコードリーダー試作（枠付き）</title>
-    <!-- QuaggaJSの読み込み (CDNを利用) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
-    <style>
-        /* カメラ映像を表示するエリアのスタイル（親要素） */
-        #interactive.viewport {
-            width: 100%;
-            max-width: 640px;
-            height: auto;
-            overflow: hidden;
-            position: relative; /* 子要素（枠）を重ねるために必要 */
-            border: 2px solid #333;
-            background: #000;
-        }
-        
-        /* カメラのビデオ映像そのもの */
-        #interactive.viewport video, canvas {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        /* ★【重要】読み取り用の四角い枠（ガイド） */
-        .scan-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%); /* 中央配置 */
-            width: 70%;  /* カメラ映像に対して70%の幅 */
-            height: 50px; /* バーコードに合わせた高さ */
-            border: 3px solid rgba(0, 255, 0, 0.7); /* 薄緑色の枠 */
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5); /* ほんのり光らせる */
-            border-radius: 5px;
-            pointer-events: none; /* この枠自体はクリック不可にする */
-            z-index: 10; /* ビデオ映像より前に出す */
-        }
-
-        /* ★赤い横線（スキャンライン風） */
-        .scan-line {
-            position: absolute;
-            top: 50%;
-            left: 5%;
-            width: 90%;
-            height: 2px;
-            background-color: rgba(255, 0, 0, 0.8);
-            transform: translateY(-50%);
-            z-index: 11;
-            /* お好みで上下にアニメーションさせてもOK */
-        }
-
-        /* 読み取り結果の表示エリア */
-        #result-box {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f0f0f0;
-            border: 1px solid #ccc;
-            font-size: 1.2rem;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        /* 更新日時を表示するエリアのスタイル */
-        #update-time {
-            margin-top: 30px;
-            font-size: 0.85rem;
-            color: #666;
-            border-top: 1px dashed #ccc;
-            padding-top: 10px;
-            text-align: center;
-        }
-    </style>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="shortcut icon" href="./images/favicon.ico">
+	<title>QuaggaJS</title>
+	<!-- CSS -->
+	<link rel="stylesheet" href="./custom.css">
 </head>
 <body>
-
-    <h1 style="text-align:center;">バーコードリーダー</h1>
-    
-    <!-- カメラ映像を表示するコンテナ -->
-    <div id="interactive" class="viewport">
-        <!-- ★ここにCSSで読み取り枠を重ねます -->
-        <div class="scan-overlay">
-            <div class="scan-line"></div>
-        </div>
-    </div>
-
-    <!-- 読み取った結果を表示する場所 -->
-    <div id="result-box">
-        読み取り結果: <span id="result" style="color:blue;">未読取</span>
-    </div>
-
-    <!-- 最終更新日時（反映確認用） -->
-    <div id="update-time">
-        ページ最終更新日時: <span id="last-modified">取得中...</span>
-    </div>
-
-    <script>
-        // 【反映確認用】ページの最終更新日時を表示
-        const modifiedDate = new Date(document.lastModified);
-        const format = (n) => String(n).padStart(2, '0');
-        document.getElementById('last-modified').textContent = `${modifiedDate.getFullYear()}/${format(modifiedDate.getMonth()+1)}/${format(modifiedDate.getDate())} ${format(modifiedDate.getHours())}:${format(modifiedDate.getMinutes())}:${format(modifiedDate.getSeconds())}`;
-
-        // QuaggaJSの設定と起動（ズーム設定は削除）
-        Quagga.init({
-            inputStream: {
-                name: "Live",
-                type: "LiveStream",
-                target: document.querySelector('#interactive'),
-                constraints: {
-                    width: 640,
-                    height: 480,
-                    facingMode: "environment" // 背面カメラ
-                    // advanced: [{ zoom: 2.0 }] // ★動かないので削除しました
-                },
-            },
-            decoder: {
-                readers: ["ean_reader"] // JANコード
-            }
-        }, function(err) {
-            if (err) {
-                console.error(err);
-                alert("カメラの起動に失敗しました: " + err);
-                return;
-            }
-            console.log("QuaggaJS初期化成功");
-            Quagga.start();
-        });
-
-        // バーコードが読み取れた時の処理
-        Quagga.onDetected(function(data) {
-            const code = data.codeResult.code;
-            // 読み取った数字を表示して、少しの間色を変えるなどの演出
-            const resultSpan = document.getElementById('result');
-            resultSpan.textContent = code;
-            resultSpan.style.color = 'red'; // 読み取ったら赤文字に
-            
-            // 1秒後に青文字に戻す
-            setTimeout(() => {
-                resultSpan.style.color = 'blue';
-            }, 1000);
-        });
-    </script>
+	<div id="my_container">
+		<div id="my_inner">
+			<div>= QuaggaJS =</div>
+			<div>
+				<button id="my_start">Start</button>
+				<button id="my_stop">Stop</button>
+			</div>
+			<div id="my_quagga"></div>
+			<div id="my_result">***</div>
+			<div id="my_barcode">
+				<div>***</div>
+			</div>
+		</div>
+	</div>
+	<!-- JavaScript -->
+	<script src="//code.jquery.com/jquery-3.6.1.min.js"></script>
+	<script src="//unpkg.com/@ericblade/quagga2@1.7.4/dist/quagga.min.js"></script>
+	<script src="//cdn.jsdelivr.net/gh/mtaketani113/jquery-barcode@master/jquery-barcode.js"></script>
+	<script src="./main.js"></script>
 </body>
 </html>
