@@ -120,7 +120,7 @@ const startScanner = () => {
         }
 
         // 3回連続で同じ数字が読めたら「確定判定」にする
-        if (_matchCount >= 3) {
+        if (_matchCount >= 30) {
             _scannerIsRunning = false; // フラグをOFF
             updateStatus("確定！");      // 状態を「確定！」に更新
             Quagga.stop();             // カメラを停止させて映像を静止させる
