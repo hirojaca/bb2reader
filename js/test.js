@@ -1,34 +1,38 @@
-let _scannerIsRunning = false; // エラー回避のため事前に定義
+let _scannerIsRunning = false; // スキャン中かどうかのフラグ
+let _lastResultCode = null;    // 直前に読み取ったコードを記憶する変数
+let _matchCount = 0;           // 同じコードが連続して一致した回数
 
 $(function () {
     startScanner();
 });
 
 const startScanner = () => {
+    // ページを開いた直後は「スキャン中」状態にする
+    updateStatus("スキャン中...");
+
     Quagga.init({
         inputStream: {
             name: "Live",
             type: "LiveStream",
             target: document.querySelector('#photo-area'),
             constraints: {
-                // フルHD（1920x1080）に近い高解像度を要求する
                 width: { min: 1024, ideal: 1920 },
                 height: { min: 768, ideal: 1080 },
-                facingMode: "environment"
+                facingMode: "environment" // 背面カメラ
             },
         },
         locate: true, 
-        // ★ここに1行追記（decoderの直上あたりに置くのが一般的です）
-        tryVertical: true,
+        tryVertical: true, // 縦向きのバーコードにも対応
         decoder: {
             readers: [
-                "ean_reader",      /* 標準の13桁JANコード用 */
-                "ean_8_reader"     /* 短縮型の8桁JANコード用（一応入れておくと安心です） */
+                "ean_reader",   /* 標準の13桁JANコード用 */
+                "ean_8_reader"  /* 短縮型の8桁JANコード用 */
             ]
         },
     }, function (err) {
         if (err) {
             console.log("Quagga Init Error:", err);
+            updateStatus("エラーが発生しました");
             return;
         }
 
@@ -36,14 +40,13 @@ const startScanner = () => {
         Quagga.start();
         _scannerIsRunning = true;
 
-        // ★実機でカメラ映像が止まる問題を追跡するための検証コード
+        // 実機でカメラ映像が止まる問題を追跡するための検証コード
         setTimeout(() => {
             const video = document.querySelector('#photo-area video');
             if (video) {
                 console.log("【検証】videoタグを発見:", video.srcObject);
                 console.log("【検証】カメラ解像度:", video.videoWidth, "x", video.videoHeight);
                 
-                // もし動画が一時停止状態なら強制再生を試みる
                 if (video.paused) {
                     console.log("【検証】動画が一時停止しています。強制再生を試みます...");
                     video.play()
@@ -55,7 +58,7 @@ const startScanner = () => {
             } else {
                 console.log("【検証】#photo-area の中にvideoタグが見つかりません。");
             }
-        }, 1000); // 起動1秒後に実行
+        }, 1000);
     });
 
     // 描画処理（緑枠などの表示）
@@ -101,12 +104,42 @@ const startScanner = () => {
         }
     });
 
-    // バーコードを検出したときの処理（ここを書き換え）
+    // バーコードを検出したときの処理（ここで3回連続一致をチェック）
     Quagga.onDetected(function (result) {
-        // 1. 念のため今まで通りコンソールにも出す
-        console.log("読み取り成功:", result.codeResult.code);
+        // すでに確定してカメラが停止している場合は、以降の処理をスルー
+        if (!_scannerIsRunning) return; 
 
-        // 2. ★ここに追記：HTMLの #result-text の中身を書き換える
-        $('#result-text').text(result.codeResult.code);
+        const currentCode = result.codeResult.code;
+
+        // 誤読防止ロジック：直前に読んだ数字と同じかどうか
+        if (currentCode === _lastResultCode) {
+            _matchCount++; // 一致したらカウントアップ
+        } else {
+            _lastResultCode = currentCode; // 違うコードなら新しく記憶
+            _matchCount = 1;               // カウントを1にリセット
+        }
+
+        // 3回連続で同じ数字が読めたら「確定判定」にする
+        if (_matchCount >= 3) {
+            _scannerIsRunning = false; // フラグをOFF
+            updateStatus("確定！");      // 状態を「確定！」に更新
+            Quagga.stop();             // カメラを停止させて映像を静止させる
+
+            // HTML側の表示を書き換える
+            $('#result-text').text(currentCode);
+            console.log("確定コード（信頼性高）:", currentCode);
+            
+            // 次回スキャン（再開用）のためにカウンターをクリア
+            _lastResultCode = null;
+            _matchCount = 0;
+        } else {
+            // カウントが3に達していない間は検証中としてスキャンを継続
+            updateStatus(`読み取り検証中... (${_matchCount}/3)`);
+        }
     });
 }
+
+// 画面のステータス表示（#status-text）を書き換える共通関数
+const updateStatus = (message) => {
+    $('#status-text').text(message);
+};
